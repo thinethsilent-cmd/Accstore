@@ -34,8 +34,26 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .yellow-glow {
-            box-shadow: 0 0 30px rgba(234, 179, 8, 0.15);
+        /* Mobile Device Frame Styling */
+        .device-frame {
+            position: relative;
+            border: 8px solid #18181b;
+            border-radius: 2rem;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .device-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40%;
+            height: 18px;
+            background: #18181b;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            z-index: 10;
         }
 
         input, select, textarea {
@@ -63,7 +81,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Hide scrollbars for clean UI */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #000; }
         ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
@@ -153,16 +170,26 @@
                                 <input type="number" id="form-price" placeholder="PRICE (SGD)" required class="w-full rounded-2xl p-4 text-xs font-bold">
                                 <input type="number" id="form-level" placeholder="LEVEL" required class="w-full rounded-2xl p-4 text-xs font-bold">
                             </div>
+                            
+                            <!-- Enhanced Image Input Section -->
                             <div class="relative aspect-video bg-black rounded-2xl border border-dashed border-white/10 overflow-hidden group">
                                 <img id="img-preview" src="" class="hidden w-full h-full object-cover">
                                 <div id="img-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-gray-700 font-black text-[10px] tracking-widest">
-                                    <i class="fas fa-camera text-3xl mb-2"></i> NO PREVIEW
+                                    <i class="fas fa-image text-3xl mb-2"></i> SELECT OR GEN IMAGE
                                 </div>
-                                <button type="button" id="btn-gen-image" class="absolute bottom-2 right-2 bg-yellow-500 text-black px-3 py-2 rounded-xl font-black text-[10px] flex items-center gap-2">
-                                    <span id="gen-loader" class="loader hidden"></span>
-                                    <i class="fas fa-sparkles"></i> GEN HERO IMAGE
-                                </button>
+                                
+                                <div class="absolute bottom-2 right-2 flex gap-2">
+                                    <label class="bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-xl font-black text-[10px] flex items-center gap-2 cursor-pointer transition">
+                                        <i class="fas fa-upload"></i> FROM DEVICE
+                                        <input type="file" id="file-upload" accept="image/*" class="hidden">
+                                    </label>
+                                    <button type="button" id="btn-gen-image" class="bg-yellow-500 text-black px-3 py-2 rounded-xl font-black text-[10px] flex items-center gap-2">
+                                        <span id="gen-loader" class="loader hidden"></span>
+                                        <i class="fas fa-sparkles"></i> AI GEN
+                                    </button>
+                                </div>
                             </div>
+
                             <select id="form-rank" class="w-full rounded-2xl p-4 text-xs font-bold uppercase">
                                 <option>Heroic</option>
                                 <option>Grandmaster</option>
@@ -229,24 +256,22 @@
             doc 
         } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
-        // Configuration
         const firebaseConfig = typeof __firebase_config !== 'undefined' 
             ? JSON.parse(__firebase_config) 
-            : { projectId: "acc-seller-trusted" }; // Fallback
+            : { projectId: "acc-seller-trusted" }; 
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'acc-seller-trusted';
-        const apiKey = ""; // Gemini API Key
+        const apiKey = ""; 
 
-        // State
         let currentUser = null;
         let accounts = [];
         let authMode = 'login';
         let currentImageBase64 = '';
+        let unsubscribeDataSync = null;
 
-        // UI Management
         window.showView = (viewName) => {
             const views = ['marketplace', 'details', 'auth', 'admin'];
             views.forEach(v => {
@@ -270,19 +295,22 @@
                 : 'Already registered? Login';
         };
 
-        // Real-time Data Sync
-        const initDataSync = () => {
+        const initDataSync = (user) => {
+            if (!user) return;
+            if (unsubscribeDataSync) unsubscribeDataSync();
+
             const listingsRef = collection(db, 'artifacts', appId, 'public', 'data', 'listings');
-            onSnapshot(listingsRef, (snapshot) => {
+            unsubscribeDataSync = onSnapshot(listingsRef, (snapshot) => {
                 accounts = snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
                                     .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
                 renderMarketplace();
                 renderAdminTable();
                 document.getElementById('count-badge').innerText = `${accounts.length} Accounts Live`;
+            }, (error) => {
+                console.error("Firestore sync error:", error);
             });
         };
 
-        // Render Marketplace
         const renderMarketplace = () => {
             const grid = document.getElementById('listings-grid');
             const empty = document.getElementById('empty-state');
@@ -298,29 +326,32 @@
             
             grid.innerHTML = accounts.map(acc => `
                 <div onclick="showDetails('${acc.id}')" class="group premium-card rounded-[2.5rem] overflow-hidden cursor-pointer">
-                    <div class="relative aspect-video overflow-hidden">
-                        ${acc.mainImageUrl 
-                            ? `<img src="${acc.mainImageUrl}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">`
-                            : `<div class="w-full h-full bg-zinc-900 flex items-center justify-center"><i class="fas fa-camera text-white/10 text-4xl"></i></div>`
-                        }
-                        <div class="absolute top-4 right-4 bg-black/80 px-3 py-1 rounded-full text-[10px] font-black border border-white/10 uppercase">LVL ${acc.level}</div>
-                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
-                        <div class="absolute bottom-4 left-6">
-                            <span class="bg-yellow-500 text-black text-[9px] font-black px-2 py-0.5 rounded uppercase mb-2 inline-block">${acc.rank}</span>
-                            <h3 class="text-xl font-black italic uppercase leading-none truncate w-48">${acc.title}</h3>
+                    <div class="relative aspect-[9/12] m-4">
+                        <!-- Mobile Device Frame Wrapper -->
+                        <div class="device-frame h-full w-full">
+                            <div class="device-notch"></div>
+                            ${acc.mainImageUrl 
+                                ? `<img src="${acc.mainImageUrl}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">`
+                                : `<div class="w-full h-full bg-zinc-900 flex items-center justify-center"><i class="fas fa-camera text-white/10 text-4xl"></i></div>`
+                            }
+                            <div class="absolute top-8 right-4 bg-black/80 px-3 py-1 rounded-full text-[10px] font-black border border-white/10 uppercase z-20">LVL ${acc.level}</div>
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80 z-10"></div>
+                            <div class="absolute bottom-6 left-6 z-20">
+                                <span class="bg-yellow-500 text-black text-[9px] font-black px-2 py-0.5 rounded uppercase mb-2 inline-block">${acc.rank}</span>
+                                <h3 class="text-xl font-black italic uppercase leading-none truncate w-40">${acc.title}</h3>
+                            </div>
                         </div>
                     </div>
-                    <div class="p-6 flex justify-between items-center bg-zinc-900/40">
-                        <span class="text-3xl font-black text-white italic">$${acc.price}</span>
+                    <div class="px-6 py-4 flex justify-between items-center bg-zinc-900/40 border-t border-white/5">
+                        <span class="text-2xl font-black text-white italic">$${acc.price}</span>
                         <div class="bg-white/5 p-3 rounded-2xl group-hover:bg-yellow-500 transition-colors group-hover:text-black">
-                            <i class="fas fa-chevron-right"></i>
+                            <i class="fas fa-arrow-right"></i>
                         </div>
                     </div>
                 </div>
             `).join('');
         };
 
-        // Render Admin Table
         const renderAdminTable = () => {
             const tbody = document.getElementById('admin-table-body');
             tbody.innerHTML = accounts.map(acc => `
@@ -346,7 +377,6 @@
             `).join('');
         };
 
-        // Show Details
         window.showDetails = (id) => {
             const acc = accounts.find(a => a.id === id);
             if (!acc) return;
@@ -357,8 +387,11 @@
                     <button onclick="showView('marketplace')" class="flex items-center gap-2 text-gray-500 hover:text-white transition font-black text-[10px] uppercase tracking-widest mb-4">
                         <i class="fas fa-chevron-left"></i> Back to Listings
                     </button>
-                    <div class="aspect-video bg-zinc-900 rounded-[3rem] border border-white/5 overflow-hidden shadow-2xl">
-                        <img src="${acc.mainImageUrl || ''}" class="w-full h-full object-cover">
+                    <div class="max-w-xs mx-auto">
+                        <div class="device-frame aspect-[9/16]">
+                            <div class="device-notch"></div>
+                            <img src="${acc.mainImageUrl || ''}" class="w-full h-full object-cover">
+                        </div>
                     </div>
                     <div class="grid grid-cols-3 gap-4 font-black italic uppercase">
                         <div class="bg-zinc-900 p-6 rounded-3xl border border-white/5 text-center">
@@ -382,13 +415,27 @@
                         ${acc.description || "Premium Singapore region account with verified 2FA and rare item history."}
                     </div>
                     <button onclick="alert('Proceeding to secure escrow agent...')" class="w-full bg-yellow-500 text-black font-black py-6 rounded-2xl hover:scale-[1.02] transition shadow-[0_0_50px_rgba(234,179,8,0.1)] uppercase tracking-widest">Buy Now</button>
-                    <p class="mt-6 text-center text-[10px] text-gray-700 font-bold uppercase tracking-widest">Verified by Trusted Market Agents</p>
                 </div>
             `;
             showView('details');
         };
 
-        // Auth Handlers
+        // File Upload Handler
+        document.getElementById('file-upload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    currentImageBase64 = event.target.result;
+                    const preview = document.getElementById('img-preview');
+                    preview.src = currentImageBase64;
+                    preview.classList.remove('hidden');
+                    document.getElementById('img-placeholder').classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
         document.getElementById('auth-form').onsubmit = async (e) => {
             e.preventDefault();
             const email = document.getElementById('auth-email').value;
@@ -410,10 +457,9 @@
 
         window.handleLogout = () => signOut(auth);
 
-        // CRUD Handlers
         document.getElementById('listing-form').onsubmit = async (e) => {
             e.preventDefault();
-            if (currentUser?.isAnonymous) return alert("Please login with admin credentials.");
+            if (!currentUser || currentUser.isAnonymous) return alert("Please login with admin credentials.");
             
             const newListing = {
                 title: document.getElementById('form-title').value,
@@ -438,13 +484,12 @@
         };
 
         window.handleDeleteListing = async (id) => {
-            if (!confirm("Delete this listing from the database?")) return;
+            if (!confirm("Delete this listing?")) return;
             try {
                 await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'listings', id));
             } catch (err) { alert(err.message); }
         };
 
-        // Image Generation
         document.getElementById('btn-gen-image').onclick = async () => {
             const title = document.getElementById('form-title').value;
             const rank = document.getElementById('form-rank').value;
@@ -454,7 +499,7 @@
             loader.classList.remove('hidden');
 
             try {
-                const prompt = `Garena Free Fire professional character skin with ${rank} rank badge, high tier account display, cinematic dark lighting, 4k wallpaper style, showcasing ${title}`;
+                const prompt = `Garena Free Fire professional character skin with ${rank} rank badge, mobile game screenshot style, high quality render, showcasing ${title}`;
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -476,11 +521,14 @@
             }
         };
 
-        // Auth Listener Initialization
-        const initAuth = async () => {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token).catch(() => signInAnonymously(auth));
-            } else {
+        const initializeFirebase = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (e) {
                 await signInAnonymously(auth);
             }
         };
@@ -490,22 +538,23 @@
             const adminControls = document.getElementById('admin-controls');
             const loginBtn = document.getElementById('nav-login');
             
-            if (user && !user.isAnonymous) {
-                adminControls.classList.remove('hidden');
-                loginBtn.classList.add('hidden');
-            } else {
-                adminControls.classList.add('hidden');
-                loginBtn.classList.remove('hidden');
-                if (document.getElementById('view-admin').classList.contains('hidden') === false) {
-                    showView('marketplace');
+            if (user) {
+                initDataSync(user);
+                if (!user.isAnonymous) {
+                    adminControls.classList.remove('hidden');
+                    loginBtn.classList.add('hidden');
+                } else {
+                    adminControls.classList.add('hidden');
+                    loginBtn.classList.remove('hidden');
+                    if (!document.getElementById('view-admin').classList.contains('hidden')) {
+                        showView('marketplace');
+                    }
                 }
             }
         });
 
-        // App Start
         window.onload = () => {
-            initAuth();
-            initDataSync();
+            initializeFirebase();
         };
 
     </script>
