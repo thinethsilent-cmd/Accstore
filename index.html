@@ -3,558 +3,488 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FF Trusted | SG Marketplace</title>
+    <title>FF-PRO | Accounts & Panels</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600;700&display=swap');
+
+        :root {
+            --primary: #ff4d00;
+            --dark-bg: #0a0a0c;
+            --card-bg: #16161a;
+            --accent: #ffb800;
+        }
+
         body {
+            background-color: var(--dark-bg);
+            color: #ffffff;
             font-family: 'Inter', sans-serif;
-            background-color: #000;
-            color: #f3f4f6;
-            overflow-x: hidden;
+            scroll-behavior: smooth;
         }
 
-        .premium-card {
-            background: linear-gradient(145deg, #18181b, #09090b);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
+
+        .hero-gradient {
+            background: radial-gradient(circle at top right, rgba(255, 77, 0, 0.15), transparent),
+                        linear-gradient(180deg, #0a0a0c 0%, #111114 100%);
         }
 
-        .premium-card:hover {
-            border-color: rgba(234, 179, 8, 0.5);
-            transform: translateY(-4px);
+        .item-card, .seller-card {
+            background: var(--card-bg);
+            border: 1px solid #2d2d33;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .glass-nav {
-            background: rgba(9, 9, 11, 0.8);
+        @media (min-width: 1024px) {
+            .item-card:hover, .seller-card:hover {
+                transform: translateY(-8px);
+                border-color: var(--primary);
+                box-shadow: 0 10px 30px -10px rgba(255, 77, 0, 0.3);
+            }
+        }
+
+        .glow-btn {
+            background: var(--primary);
+            transition: 0.3s;
+            box-shadow: 0 0 15px rgba(255, 77, 0, 0.4);
+        }
+
+        .modal-blur {
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(0, 0, 0, 0.85);
         }
 
-        /* Mobile Device Frame Styling */
-        .device-frame {
-            position: relative;
-            border: 8px solid #18181b;
-            border-radius: 2rem;
-            overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        .shimmer {
+            background: linear-gradient(90deg, #16161a 25%, #24242b 50%, #16161a 75%);
+            background-size: 200% 100%;
+            animation: shimmer-effect 1.5s infinite;
         }
 
-        .device-notch {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 40%;
-            height: 18px;
-            background: #18181b;
-            border-bottom-left-radius: 12px;
-            border-bottom-right-radius: 12px;
-            z-index: 10;
+        @keyframes shimmer-effect {
+            to { background-position: -200% 0; }
         }
 
-        input, select, textarea {
-            background-color: #000 !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            transition: border-color 0.3s ease;
+        .search-input {
+            background: #1c1c21;
+            border: 1px solid #2d2d33;
         }
 
-        input:focus, select:focus, textarea:focus {
-            border-color: #eab308 !important;
-            outline: none;
+        .search-input:focus {
+            border-color: var(--primary);
+            background: #24242b;
         }
 
-        .loader {
-            border: 2px solid #18181b;
-            border-top: 2px solid #eab308;
-            border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            animation: spin 1s linear infinite;
+        .active-nav {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #000; }
-        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #eab308; }
+        input[type=range] { accent-color: var(--primary); }
     </style>
 </head>
-<body class="min-h-screen">
+<body class="overflow-x-hidden">
 
-    <!-- Navigation -->
-    <nav class="glass-nav fixed top-0 w-full z-50">
-        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
-            <div class="flex items-center gap-3 cursor-pointer" onclick="showView('marketplace')">
-                <div class="bg-yellow-500 p-2 rounded-xl">
-                    <i class="fas fa-shopping-bag text-black"></i>
+    <!-- Header / Nav -->
+    <nav class="fixed top-0 w-full z-[60] border-b border-white/5 bg-black/60 backdrop-blur-xl">
+        <div class="container mx-auto px-4 h-16 md:h-20 flex items-center justify-between">
+            <div class="flex items-center gap-2 group cursor-pointer" onclick="navigate('accounts')">
+                <div class="w-9 h-9 bg-orange-600 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-bolt text-white"></i>
                 </div>
-                <h1 class="text-2xl font-black italic tracking-tighter">FF<span class="text-yellow-500">TRUSTED</span></h1>
+                <h1 class="text-xl font-bold font-orbitron tracking-tighter">FF<span class="text-orange-500">PRO</span></h1>
             </div>
 
-            <div class="flex gap-6 items-center">
-                <button onclick="showView('marketplace')" id="nav-market" class="text-xs font-black uppercase tracking-widest text-yellow-500 transition">Market</button>
-                <div id="admin-controls" class="hidden flex items-center gap-6">
-                    <button onclick="showView('admin')" id="nav-admin" class="text-xs font-black uppercase tracking-widest text-gray-500 transition flex items-center gap-2">
-                        <i class="fas fa-shield-halved"></i> Dashboard
-                    </button>
-                    <button onclick="handleLogout()" class="text-gray-600 hover:text-red-500 transition"><i class="fas fa-sign-out-alt"></i></button>
-                </div>
-                <button id="nav-login" onclick="showView('auth')" class="bg-yellow-500 text-black px-6 py-2 rounded-full font-black text-xs uppercase tracking-widest hover:scale-105 transition">Login</button>
+            <!-- Desktop Links -->
+            <div class="hidden md:flex items-center gap-8 font-bold text-sm uppercase tracking-widest">
+                <button onclick="navigate('accounts')" id="nav-accounts" class="hover:text-orange-500 transition active-nav pb-1">Accounts</button>
+                <button onclick="navigate('panels')" id="nav-panels" class="hover:text-orange-500 transition pb-1">Panels</button>
+                <button onclick="navigate('sellers')" id="nav-sellers" class="hover:text-orange-500 transition pb-1">Sellers</button>
+                <button onclick="navigate('support')" id="nav-support" class="hover:text-orange-500 transition pb-1">Support</button>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button onclick="openAuthModal()" id="auth-btn-main" class="px-4 py-2 rounded-full text-xs font-bold border border-white/10 hover:bg-white/5">Login</button>
+                <button onclick="toggleMobileMenu()" class="md:hidden text-xl p-2"><i class="fas fa-bars"></i></button>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-6 pt-32 pb-20">
-        
-        <!-- Marketplace View -->
-        <section id="view-marketplace" class="animate-in fade-in duration-700">
-            <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-4">
-                <div class="space-y-2">
-                    <h2 class="text-5xl md:text-7xl font-black italic tracking-tighter uppercase leading-none">SG MARKET</h2>
-                    <p class="text-gray-500 text-sm font-bold tracking-widest">VERIFIED GARENA FREE FIRE ACCOUNTS • SINGAPORE REGION</p>
-                </div>
-                <div class="bg-zinc-900 border border-white/5 px-6 py-3 rounded-full flex items-center gap-3 text-[10px] font-black tracking-widest uppercase">
-                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    <span id="count-badge">0 Accounts Live</span>
-                </div>
-            </div>
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="fixed inset-0 z-[70] bg-black hidden flex-col items-center justify-center gap-8 text-2xl font-orbitron">
+        <button onclick="toggleMobileMenu()" class="absolute top-6 right-6 text-3xl">&times;</button>
+        <button onclick="navigate('accounts'); toggleMobileMenu()">Accounts</button>
+        <button onclick="navigate('panels'); toggleMobileMenu()">Panels</button>
+        <button onclick="navigate('sellers'); toggleMobileMenu()">Sellers</button>
+        <button onclick="navigate('support'); toggleMobileMenu()">Support</button>
+    </div>
 
-            <div id="listings-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Data injected here -->
-            </div>
-            <div id="empty-state" class="hidden py-32 text-center border-2 border-dashed border-white/5 rounded-[3rem]">
-                <p class="text-gray-600 font-black uppercase tracking-widest italic">Inventory Empty</p>
-            </div>
-        </section>
-
-        <!-- Details View -->
-        <section id="view-details" class="hidden animate-in fade-in duration-500">
-            <div id="details-container" class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                <!-- Data injected here -->
-            </div>
-        </section>
-
-        <!-- Auth View -->
-        <section id="view-auth" class="hidden animate-in fade-in duration-500">
-            <div class="max-w-md mx-auto mt-10 bg-zinc-900 p-10 rounded-[2.5rem] border border-white/5 shadow-2xl">
-                <h2 id="auth-title" class="text-3xl font-black mb-8 text-center italic uppercase">Admin Access</h2>
-                <form id="auth-form" class="space-y-4">
-                    <input type="email" id="auth-email" placeholder="EMAIL ADDRESS" required class="w-full rounded-2xl p-4 text-xs font-bold uppercase tracking-widest">
-                    <input type="password" id="auth-password" placeholder="PASSWORD" required class="w-full rounded-2xl p-4 text-xs font-bold uppercase tracking-widest">
-                    <button type="submit" class="w-full bg-yellow-500 text-black font-black py-4 rounded-2xl hover:scale-[1.02] transition uppercase tracking-widest text-xs">Continue</button>
-                </form>
-                <p id="auth-error" class="text-red-500 text-[10px] font-bold uppercase mt-4 text-center hidden"></p>
-                <button onclick="toggleAuthMode()" id="auth-toggle" class="w-full mt-6 text-gray-500 text-[10px] font-black uppercase tracking-widest hover:text-white transition">Need an admin account? Register</button>
-            </div>
-        </section>
-
-        <!-- Admin View -->
-        <section id="view-admin" class="hidden animate-in fade-in duration-500">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div class="lg:col-span-1 space-y-6">
-                    <div class="bg-zinc-900 p-8 rounded-[2.5rem] border border-white/5">
-                        <h2 class="text-xl font-black mb-6 italic uppercase flex items-center gap-2">
-                            <i class="fas fa-plus text-yellow-500"></i> New Account
-                        </h2>
-                        <form id="listing-form" class="space-y-4">
-                            <input type="text" id="form-title" placeholder="ACCOUNT TITLE" required class="w-full rounded-2xl p-4 text-xs font-bold uppercase">
-                            <div class="grid grid-cols-2 gap-4">
-                                <input type="number" id="form-price" placeholder="PRICE (SGD)" required class="w-full rounded-2xl p-4 text-xs font-bold">
-                                <input type="number" id="form-level" placeholder="LEVEL" required class="w-full rounded-2xl p-4 text-xs font-bold">
-                            </div>
-                            
-                            <!-- Enhanced Image Input Section -->
-                            <div class="relative aspect-video bg-black rounded-2xl border border-dashed border-white/10 overflow-hidden group">
-                                <img id="img-preview" src="" class="hidden w-full h-full object-cover">
-                                <div id="img-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-gray-700 font-black text-[10px] tracking-widest">
-                                    <i class="fas fa-image text-3xl mb-2"></i> SELECT OR GEN IMAGE
-                                </div>
-                                
-                                <div class="absolute bottom-2 right-2 flex gap-2">
-                                    <label class="bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-xl font-black text-[10px] flex items-center gap-2 cursor-pointer transition">
-                                        <i class="fas fa-upload"></i> FROM DEVICE
-                                        <input type="file" id="file-upload" accept="image/*" class="hidden">
-                                    </label>
-                                    <button type="button" id="btn-gen-image" class="bg-yellow-500 text-black px-3 py-2 rounded-xl font-black text-[10px] flex items-center gap-2">
-                                        <span id="gen-loader" class="loader hidden"></span>
-                                        <i class="fas fa-sparkles"></i> AI GEN
-                                    </button>
-                                </div>
-                            </div>
-
-                            <select id="form-rank" class="w-full rounded-2xl p-4 text-xs font-bold uppercase">
-                                <option>Heroic</option>
-                                <option>Grandmaster</option>
-                                <option>Master</option>
-                                <option>Diamond</option>
-                            </select>
-                            <textarea id="form-desc" placeholder="SKINS & DETAILS..." class="w-full rounded-2xl p-4 text-xs font-bold h-32 uppercase"></textarea>
-                            <button type="submit" class="w-full bg-white text-black font-black py-4 rounded-2xl hover:bg-yellow-500 transition uppercase tracking-widest text-xs">Publish to Marketplace</button>
-                        </form>
-                    </div>
-                </div>
-
-                <div class="lg:col-span-2">
-                    <div class="bg-zinc-900 rounded-[2.5rem] border border-white/5 overflow-hidden">
-                        <div class="p-6 border-b border-white/5 bg-black/20 font-black italic tracking-widest text-[10px] uppercase">Live Database Sync</div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs">
-                                <thead>
-                                    <tr class="text-gray-500 uppercase tracking-widest border-b border-white/5">
-                                        <th class="p-6">Account Listing</th>
-                                        <th class="p-6">Price</th>
-                                        <th class="p-6 text-right">Delete</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="admin-table-body" class="divide-y divide-white/5">
-                                    <!-- Data injected here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
+    <!-- Main View Controller -->
+    <main id="view-container" class="pt-20">
+        <!-- Views injected here -->
     </main>
 
-    <footer class="mt-20 border-t border-white/5 p-12 text-center">
-        <p class="text-[10px] font-black text-gray-700 uppercase tracking-[0.4em] italic mb-4">Secured by Cloud Firestore & 2FA Verification</p>
-        <div class="flex justify-center gap-6 text-gray-800">
-            <i class="fab fa-discord hover:text-white cursor-pointer transition"></i>
-            <i class="fab fa-instagram hover:text-white cursor-pointer transition"></i>
-            <i class="fab fa-telegram hover:text-white cursor-pointer transition"></i>
+    <!-- Detail Modal -->
+    <div id="detail-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-2 md:p-4 overflow-y-auto">
+        <div class="modal-blur absolute inset-0" onclick="closeModals()"></div>
+        <div id="modal-content" class="bg-zinc-900 border border-zinc-800 w-full max-w-5xl rounded-3xl overflow-hidden relative z-10 flex flex-col lg:flex-row shadow-2xl my-auto"></div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="fixed inset-0 z-[110] hidden items-center justify-center p-4">
+        <div class="modal-blur absolute inset-0" onclick="closeModals()"></div>
+        <div class="bg-zinc-900 border border-zinc-800 w-full max-w-md rounded-2xl p-6 md:p-10 relative z-10">
+            <h4 id="auth-title" class="text-xl font-bold font-orbitron mb-6 text-center">Login</h4>
+            <form onsubmit="processAuth(event)" class="space-y-4">
+                <input type="email" id="auth-email" placeholder="Email" required class="w-full bg-zinc-800 border border-white/5 p-3 rounded-xl outline-none focus:border-orange-500">
+                <input type="password" id="auth-password" placeholder="Password" required class="w-full bg-zinc-800 border border-white/5 p-3 rounded-xl outline-none focus:border-orange-500">
+                <button type="submit" class="glow-btn w-full py-3 rounded-xl font-bold">Continue</button>
+            </form>
         </div>
-    </footer>
+    </div>
 
-    <!-- Firebase SDKs -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-        import { 
-            getAuth, 
-            onAuthStateChanged, 
-            signInWithEmailAndPassword, 
-            createUserWithEmailAndPassword, 
-            signOut,
-            signInAnonymously,
-            signInWithCustomToken
-        } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-        import { 
-            getFirestore, 
-            collection, 
-            onSnapshot, 
-            addDoc, 
-            deleteDoc, 
-            doc 
-        } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = typeof __firebase_config !== 'undefined' 
-            ? JSON.parse(__firebase_config) 
-            : { projectId: "acc-seller-trusted" }; 
-
+        const firebaseConfig = JSON.parse(__firebase_config);
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'acc-seller-trusted';
-        const apiKey = ""; 
-
-        let currentUser = null;
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const LKR_RATE = 300;
+        
+        // CUSTOMER SUPPORT PHONE NUMBER
+        const CONTACT_PHONE = "94781381040";
+        
+        let currentView = 'accounts';
         let accounts = [];
-        let authMode = 'login';
-        let currentImageBase64 = '';
-        let unsubscribeDataSync = null;
+        let sellerFilter = 'all';
+        
+        let panels = [
+            { id: 'p1', title: 'Viper VIP Panel v4', type: 'Panel', price: 15, features: ['Aimbot', 'Wallhack', 'Anti-Ban'], img: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=600', seller: 'ViperModz' },
+            { id: 'p2', title: 'Ghost Injector PRO', type: 'Injector', price: 10, features: ['ESP', 'Auto-Headshot', 'No Recoil'], img: 'https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format&fit=crop&q=80&w=600', seller: 'GhostX' },
+            { id: 'p3', title: 'Zeus Menu Premium', type: 'Mod Menu', price: 25, features: ['Speed Hack', 'Fly Hack', 'Safe Play'], img: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=600', seller: 'ZeusDev' }
+        ];
 
-        window.showView = (viewName) => {
-            const views = ['marketplace', 'details', 'auth', 'admin'];
-            views.forEach(v => {
-                document.getElementById(`view-${v}`).classList.add('hidden');
-                const navBtn = document.getElementById(`nav-${v}`);
-                if (navBtn) navBtn.classList.replace('text-yellow-500', 'text-gray-500');
-            });
-            
-            document.getElementById(`view-${viewName}`).classList.remove('hidden');
-            const activeNav = document.getElementById(`nav-${viewName}`);
-            if (activeNav) activeNav.classList.replace('text-gray-500', 'text-yellow-500');
-            
-            window.scrollTo(0, 0);
+        const sellers = [
+            { id: 's1', name: 'KingSL', items: 142, rating: 4.9, joined: 'Jan 2023', verified: true, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=King' },
+            { id: 's2', name: 'EliteGamer', items: 89, rating: 4.8, joined: 'Mar 2023', verified: true, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Elite' },
+            { id: 's3', name: 'ViperModz', items: 56, rating: 4.7, joined: 'Jun 2023', verified: true, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Viper' },
+            { id: 's4', name: 'GhostX', items: 34, rating: 4.5, joined: 'Oct 2023', verified: false, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ghost' }
+        ];
+
+        // NAVIGATION
+        window.navigate = (view) => {
+            currentView = view;
+            updateNavStyles();
+            renderView();
+            window.scrollTo(0,0);
         };
 
-        window.toggleAuthMode = () => {
-            authMode = authMode === 'login' ? 'register' : 'login';
-            document.getElementById('auth-title').innerText = authMode === 'login' ? 'Admin Access' : 'Create Admin';
-            document.getElementById('auth-toggle').innerText = authMode === 'login' 
-                ? 'Need an admin account? Register' 
-                : 'Already registered? Login';
+        window.showSellerAccounts = (sellerName) => {
+            sellerFilter = sellerName;
+            navigate('accounts');
+            setTimeout(() => {
+                const sellerSelect = document.getElementById('seller-filter-dropdown');
+                if (sellerSelect) {
+                    sellerSelect.value = sellerName;
+                    applyFilters();
+                }
+            }, 50);
         };
 
-        const initDataSync = (user) => {
-            if (!user) return;
-            if (unsubscribeDataSync) unsubscribeDataSync();
+        function updateNavStyles() {
+            document.querySelectorAll('.active-nav').forEach(el => el.classList.remove('active-nav'));
+            const activeEl = document.getElementById(`nav-${currentView}`);
+            if (activeEl) activeEl.classList.add('active-nav');
+        }
 
-            const listingsRef = collection(db, 'artifacts', appId, 'public', 'data', 'listings');
-            unsubscribeDataSync = onSnapshot(listingsRef, (snapshot) => {
-                accounts = snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
-                                    .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-                renderMarketplace();
-                renderAdminTable();
-                document.getElementById('count-badge').innerText = `${accounts.length} Accounts Live`;
-            }, (error) => {
-                console.error("Firestore sync error:", error);
-            });
+        window.toggleMobileMenu = () => {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+            menu.classList.toggle('flex');
         };
 
-        const renderMarketplace = () => {
-            const grid = document.getElementById('listings-grid');
-            const empty = document.getElementById('empty-state');
+        // VIEWS & FILTERING
+        function renderView() {
+            const container = document.getElementById('view-container');
             
-            if (accounts.length === 0) {
+            if (currentView === 'accounts' || currentView === 'panels') {
+                container.innerHTML = `
+                    <section class="hero-gradient px-4 py-12 md:py-16 text-center">
+                        <h2 class="text-3xl md:text-5xl font-bold font-orbitron mb-4">${currentView === 'accounts' ? 'Premium Accounts' : 'Game Panels'}</h2>
+                        <p class="text-gray-400 text-sm max-w-xl mx-auto">Filter and find the best items in Sri Lanka.</p>
+                    </section>
+                    <div class="container mx-auto px-4 py-8">
+                        <div class="bg-zinc-900/50 border border-white/5 p-4 rounded-2xl mb-8 grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                            <div class="md:col-span-1">
+                                <label class="text-[10px] font-bold text-gray-500 uppercase block mb-2">Price Max (LKR)</label>
+                                <input type="range" id="price-range" min="0" max="250000" step="1000" value="250000" 
+                                    oninput="document.getElementById('price-val').innerText = parseInt(this.value).toLocaleString(); applyFilters();" class="w-full">
+                                <div class="text-[10px] mt-1 text-orange-500 font-bold">Up to: Rs. <span id="price-val">250,000</span></div>
+                            </div>
+                            ${currentView === 'accounts' ? `
+                                <div>
+                                    <label class="text-[10px] font-bold text-gray-500 uppercase block mb-2">Min Level</label>
+                                    <select id="level-filter" onchange="applyFilters()" class="search-input w-full p-2.5 rounded-xl text-sm outline-none">
+                                        <option value="0">Any Level</option>
+                                        <option value="50">Level 50+</option>
+                                        <option value="70">Level 70+</option>
+                                        <option value="85">Level 85+</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-bold text-gray-500 uppercase block mb-2">Rank</label>
+                                    <select id="rank-filter" onchange="applyFilters()" class="search-input w-full p-2.5 rounded-xl text-sm outline-none">
+                                        <option value="all">All Ranks</option>
+                                        <option value="grandmaster">Grandmaster</option>
+                                        <option value="heroic">Heroic</option>
+                                        <option value="master">Master</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-bold text-gray-500 uppercase block mb-2">Seller</label>
+                                    <select id="seller-filter-dropdown" onchange="applyFilters()" class="search-input w-full p-2.5 rounded-xl text-sm outline-none">
+                                        <option value="all">All Sellers</option>
+                                        ${sellers.map(s => `<option value="${s.name}">${s.name}</option>`).join('')}
+                                    </select>
+                                </div>
+                            ` : `
+                                <div>
+                                    <label class="text-[10px] font-bold text-gray-500 uppercase block mb-2">Type</label>
+                                    <select id="type-filter" onchange="applyFilters()" class="search-input w-full p-2.5 rounded-xl text-sm outline-none">
+                                        <option value="all">All Tools</option>
+                                        <option value="panel">Panels</option>
+                                        <option value="injector">Injectors</option>
+                                        <option value="mod menu">Mod Menus</option>
+                                    </select>
+                                </div>
+                                <div></div>
+                            `}
+                            <button onclick="resetFilters()" class="bg-white/5 hover:bg-white/10 p-2.5 rounded-xl text-xs font-bold transition">Reset Filters</button>
+                        </div>
+                        
+                        <div id="item-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div class="aspect-video shimmer rounded-3xl"></div>
+                            <div class="aspect-video shimmer rounded-3xl"></div>
+                        </div>
+                        <div id="no-results" class="hidden py-20 text-center text-gray-500">No items match your filters.</div>
+                    </div>
+                `;
+                if (currentView === 'accounts') fetchData('accounts');
+                else applyFilters();
+            } else if (currentView === 'sellers') {
+                container.innerHTML = `
+                    <section class="hero-gradient px-4 py-12 md:py-16 text-center">
+                        <h2 class="text-3xl md:text-5xl font-bold font-orbitron mb-4">Trusted Sellers</h2>
+                        <p class="text-gray-400 text-sm max-w-xl mx-auto">Verified community members with 100% success rates.</p>
+                        <button onclick="contactSupport('Apply to be a Seller')" class="mt-6 inline-flex items-center gap-2 bg-white/5 border border-white/10 px-6 py-2 rounded-full text-xs font-bold hover:bg-orange-500 hover:text-white transition">
+                            <i class="fas fa-certificate text-orange-500"></i> Become a Seller
+                        </button>
+                    </section>
+                    <div class="container mx-auto px-4 py-12">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            ${sellers.map(s => `
+                                <div class="seller-card p-6 rounded-2xl text-center">
+                                    <div class="relative w-20 h-20 mx-auto mb-4">
+                                        <img src="${s.avatar}" class="w-full h-full rounded-full bg-zinc-800 p-2">
+                                        ${s.verified ? '<i class="fas fa-check-circle absolute bottom-0 right-0 text-blue-500 bg-white rounded-full"></i>' : ''}
+                                    </div>
+                                    <h4 class="font-bold font-orbitron mb-1">${s.name}</h4>
+                                    <div class="flex items-center justify-center gap-1 text-orange-500 text-xs mb-4">
+                                        <i class="fas fa-star"></i>
+                                        <span>${s.rating}</span>
+                                        <span class="text-gray-500 ml-1">(${s.items} Sales)</span>
+                                    </div>
+                                    <div class="text-[10px] text-gray-500 uppercase font-bold mb-4">Joined ${s.joined}</div>
+                                    <button onclick="showSellerAccounts('${s.name}')" class="w-full py-2 rounded-lg bg-zinc-800 text-[10px] font-bold uppercase hover:bg-orange-500 transition">Sellers FF Accounts</button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else if (currentView === 'support') {
+                container.innerHTML = `
+                    <section class="hero-gradient px-4 py-12 md:py-16 text-center">
+                        <h2 class="text-3xl md:text-5xl font-bold font-orbitron mb-4">Support Center</h2>
+                        <p class="text-gray-400 text-sm max-w-xl mx-auto">Need help with a purchase or have a question? Contact us.</p>
+                    </section>
+                    <div class="container mx-auto px-4 py-12 max-w-2xl">
+                        <div class="bg-zinc-900 border border-white/5 rounded-3xl p-8 text-center">
+                            <i class="fab fa-whatsapp text-6xl text-green-500 mb-6 block"></i>
+                            <h3 class="text-2xl font-bold font-orbitron mb-4">WhatsApp Support</h3>
+                            <p class="text-gray-400 mb-2">Direct chat with our admin for safe trades.</p>
+                            <p class="text-orange-500 font-bold mb-8 text-lg">${CONTACT_PHONE}</p>
+                            <button onclick="contactSupport('Hello, I need help with...')" class="glow-btn w-full py-4 rounded-xl font-bold text-lg">Chat with Admin</button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        window.resetFilters = () => {
+            sellerFilter = 'all';
+            document.getElementById('price-range').value = 250000;
+            document.getElementById('price-val').innerText = "250,000";
+            if(document.getElementById('level-filter')) document.getElementById('level-filter').value = 0;
+            if(document.getElementById('rank-filter')) document.getElementById('rank-filter').value = 'all';
+            if(document.getElementById('type-filter')) document.getElementById('type-filter').value = 'all';
+            if(document.getElementById('seller-filter-dropdown')) document.getElementById('seller-filter-dropdown').value = 'all';
+            applyFilters();
+        };
+
+        window.applyFilters = () => {
+            const maxPrice = parseInt(document.getElementById('price-range').value);
+            let filtered = [];
+            
+            if (currentView === 'accounts') {
+                const minLevel = parseInt(document.getElementById('level-filter').value);
+                const rank = document.getElementById('rank-filter').value;
+                const seller = document.getElementById('seller-filter-dropdown').value;
+                
+                filtered = accounts.filter(a => {
+                    const matchesPrice = (a.price * LKR_RATE) <= maxPrice;
+                    const matchesLevel = a.level >= minLevel;
+                    const matchesRank = rank === 'all' || a.rank.toLowerCase().includes(rank);
+                    const matchesSeller = seller === 'all' || a.seller === seller;
+                    return matchesPrice && matchesLevel && matchesRank && matchesSeller;
+                });
+            } else {
+                const typeInput = document.getElementById('type-filter');
+                const type = typeInput ? typeInput.value : 'all';
+                filtered = panels.filter(p => {
+                    const matchesPrice = (p.price * LKR_RATE) <= maxPrice;
+                    const matchesType = type === 'all' || p.type.toLowerCase() === type;
+                    return matchesPrice && matchesType;
+                });
+            }
+
+            renderItems(filtered, currentView);
+        };
+
+        function renderItems(data, type) {
+            const grid = document.getElementById('item-grid');
+            const empty = document.getElementById('no-results');
+            if (!grid || !empty) return;
+
+            if (data.length === 0) {
                 grid.classList.add('hidden');
                 empty.classList.remove('hidden');
                 return;
             }
-
             grid.classList.remove('hidden');
             empty.classList.add('hidden');
-            
-            grid.innerHTML = accounts.map(acc => `
-                <div onclick="showDetails('${acc.id}')" class="group premium-card rounded-[2.5rem] overflow-hidden cursor-pointer">
-                    <div class="relative aspect-[9/12] m-4">
-                        <!-- Mobile Device Frame Wrapper -->
-                        <div class="device-frame h-full w-full">
-                            <div class="device-notch"></div>
-                            ${acc.mainImageUrl 
-                                ? `<img src="${acc.mainImageUrl}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">`
-                                : `<div class="w-full h-full bg-zinc-900 flex items-center justify-center"><i class="fas fa-camera text-white/10 text-4xl"></i></div>`
-                            }
-                            <div class="absolute top-8 right-4 bg-black/80 px-3 py-1 rounded-full text-[10px] font-black border border-white/10 uppercase z-20">LVL ${acc.level}</div>
-                            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80 z-10"></div>
-                            <div class="absolute bottom-6 left-6 z-20">
-                                <span class="bg-yellow-500 text-black text-[9px] font-black px-2 py-0.5 rounded uppercase mb-2 inline-block">${acc.rank}</span>
-                                <h3 class="text-xl font-black italic uppercase leading-none truncate w-40">${acc.title}</h3>
-                            </div>
+
+            grid.innerHTML = data.map(item => `
+                <div class="item-card rounded-2xl p-3 cursor-pointer group" onclick="viewDetails('${item.id}', '${type}')">
+                    <div class="relative aspect-video rounded-xl overflow-hidden mb-4">
+                        <img src="${item.img}" class="w-full h-full object-cover">
+                        <div class="absolute top-3 right-3 bg-black/60 px-2 py-1 rounded text-[10px] font-bold">
+                            ${item.rank || item.type}
                         </div>
                     </div>
-                    <div class="px-6 py-4 flex justify-between items-center bg-zinc-900/40 border-t border-white/5">
-                        <span class="text-2xl font-black text-white italic">$${acc.price}</span>
-                        <div class="bg-white/5 p-3 rounded-2xl group-hover:bg-yellow-500 transition-colors group-hover:text-black">
-                            <i class="fas fa-arrow-right"></i>
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h4 class="font-bold font-orbitron group-hover:text-orange-500 transition line-clamp-1">${item.title}</h4>
+                            <p class="text-xs text-gray-500">Lv. ${item.level || 'Tool'} • Seller: ${item.seller || 'Verified'}</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-orange-500 font-bold block leading-none text-lg">Rs. ${(item.price * LKR_RATE).toLocaleString()}</span>
                         </div>
                     </div>
+                    <button class="w-full py-2 bg-zinc-800 rounded-lg text-xs font-bold uppercase tracking-wider">Details</button>
                 </div>
             `).join('');
-        };
+        }
 
-        const renderAdminTable = () => {
-            const tbody = document.getElementById('admin-table-body');
-            tbody.innerHTML = accounts.map(acc => `
-                <tr class="hover:bg-white/[0.02] transition-colors">
-                    <td class="p-6">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-xl bg-black border border-white/10 overflow-hidden">
-                                <img src="${acc.mainImageUrl || ''}" class="w-full h-full object-cover">
-                            </div>
-                            <div>
-                                <div class="font-black uppercase text-sm">${acc.title}</div>
-                                <div class="text-[10px] text-gray-500 uppercase tracking-widest">LVL ${acc.level} • ${acc.rank}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="p-6 font-black text-yellow-500">$${acc.price}</td>
-                    <td class="p-6 text-right">
-                        <button onclick="handleDeleteListing('${acc.id}')" class="text-gray-600 hover:text-red-500 transition-colors p-2">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-        };
+        window.viewDetails = (id, type) => {
+            const item = type === 'accounts' ? accounts.find(a => a.id === id) : panels.find(p => p.id === id);
+            if (!item) return;
 
-        window.showDetails = (id) => {
-            const acc = accounts.find(a => a.id === id);
-            if (!acc) return;
+            const modal = document.getElementById('detail-modal');
+            const content = document.getElementById('modal-content');
             
-            const container = document.getElementById('details-container');
-            container.innerHTML = `
-                <div class="space-y-6">
-                    <button onclick="showView('marketplace')" class="flex items-center gap-2 text-gray-500 hover:text-white transition font-black text-[10px] uppercase tracking-widest mb-4">
-                        <i class="fas fa-chevron-left"></i> Back to Listings
+            content.innerHTML = `
+                <div class="lg:w-1/2 h-64 lg:h-auto"><img src="${item.img}" class="w-full h-full object-cover"></div>
+                <div class="lg:w-1/2 p-8 flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-3xl font-bold font-orbitron mb-4">${item.title}</h4>
+                        <div class="flex justify-between items-center mb-6 bg-white/5 p-4 rounded-xl border border-white/5">
+                            <span class="text-2xl font-bold text-orange-500">Rs. ${(item.price * LKR_RATE).toLocaleString()}</span>
+                            <span class="text-xs text-gray-500">Seller: ${item.seller || 'Admin'}</span>
+                        </div>
+                        <div class="space-y-3 text-sm text-gray-300 mb-8">
+                            <p><i class="fas fa-check-circle text-orange-500 mr-2"></i> ${type === 'accounts' ? 'Level: ' + item.level : 'Features: ' + item.features.join(', ')}</p>
+                            <p><i class="fas fa-check-circle text-orange-500 mr-2"></i> Rank: ${item.rank || item.type}</p>
+                            <p><i class="fas fa-check-circle text-orange-500 mr-2"></i> Region: ${item.region || 'Asia'}</p>
+                        </div>
+                    </div>
+                    <button onclick="buyNow('${item.id}', '${type}')" class="glow-btn w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2">
+                        <i class="fab fa-whatsapp"></i> Buy via WhatsApp
                     </button>
-                    <div class="max-w-xs mx-auto">
-                        <div class="device-frame aspect-[9/16]">
-                            <div class="device-notch"></div>
-                            <img src="${acc.mainImageUrl || ''}" class="w-full h-full object-cover">
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-3 gap-4 font-black italic uppercase">
-                        <div class="bg-zinc-900 p-6 rounded-3xl border border-white/5 text-center">
-                            <div class="text-[10px] text-gray-600 mb-1">Level</div>
-                            <div class="text-2xl">${acc.level}</div>
-                        </div>
-                        <div class="bg-zinc-900 p-6 rounded-3xl border border-white/5 text-center">
-                            <div class="text-[10px] text-gray-600 mb-1">Rank</div>
-                            <div class="text-2xl text-yellow-500">${acc.rank}</div>
-                        </div>
-                        <div class="bg-zinc-900 p-6 rounded-3xl border border-white/5 text-center">
-                            <div class="text-[10px] text-gray-600 mb-1">Region</div>
-                            <div class="text-2xl">SG</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex flex-col justify-center">
-                    <h2 class="text-5xl md:text-6xl font-black italic tracking-tighter mb-4 uppercase leading-none">${acc.title}</h2>
-                    <div class="text-6xl font-black text-yellow-500 mb-8 italic">$${acc.price}</div>
-                    <div class="bg-zinc-900/50 p-8 rounded-[2.5rem] border border-white/5 italic text-gray-400 leading-relaxed mb-8">
-                        ${acc.description || "Premium Singapore region account with verified 2FA and rare item history."}
-                    </div>
-                    <button onclick="alert('Proceeding to secure escrow agent...')" class="w-full bg-yellow-500 text-black font-black py-6 rounded-2xl hover:scale-[1.02] transition shadow-[0_0_50px_rgba(234,179,8,0.1)] uppercase tracking-widest">Buy Now</button>
                 </div>
             `;
-            showView('details');
+            modal.classList.replace('hidden', 'flex');
         };
 
-        // File Upload Handler
-        document.getElementById('file-upload').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    currentImageBase64 = event.target.result;
-                    const preview = document.getElementById('img-preview');
-                    preview.src = currentImageBase64;
-                    preview.classList.remove('hidden');
-                    document.getElementById('img-placeholder').classList.add('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        document.getElementById('auth-form').onsubmit = async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('auth-email').value;
-            const password = document.getElementById('auth-password').value;
-            const errorEl = document.getElementById('auth-error');
-            
-            try {
-                if (authMode === 'register') {
-                    await createUserWithEmailAndPassword(auth, email, password);
-                } else {
-                    await signInWithEmailAndPassword(auth, email, password);
-                }
-                showView('marketplace');
-            } catch (err) {
-                errorEl.innerText = err.message.toUpperCase();
-                errorEl.classList.remove('hidden');
-            }
+        window.buyNow = (id, type) => {
+            const item = type === 'accounts' ? accounts.find(a => a.id === id) : panels.find(p => p.id === id);
+            contactSupport(`I want to buy:\n\nItem: ${item.title}\nSeller: ${item.seller}\nPrice: Rs. ${(item.price * LKR_RATE).toLocaleString()}\nID: ${item.id}`);
         };
 
-        window.handleLogout = () => signOut(auth);
-
-        document.getElementById('listing-form').onsubmit = async (e) => {
-            e.preventDefault();
-            if (!currentUser || currentUser.isAnonymous) return alert("Please login with admin credentials.");
-            
-            const newListing = {
-                title: document.getElementById('form-title').value,
-                price: document.getElementById('form-price').value,
-                level: document.getElementById('form-level').value,
-                rank: document.getElementById('form-rank').value,
-                description: document.getElementById('form-desc').value,
-                mainImageUrl: currentImageBase64,
-                createdAt: Date.now(),
-                sellerId: currentUser.uid
-            };
-
-            try {
-                const col = collection(db, 'artifacts', appId, 'public', 'data', 'listings');
-                await addDoc(col, newListing);
-                document.getElementById('listing-form').reset();
-                document.getElementById('img-preview').classList.add('hidden');
-                document.getElementById('img-placeholder').classList.remove('hidden');
-                currentImageBase64 = '';
-                alert("Account Published Successfully");
-            } catch (err) { alert(err.message); }
+        window.contactSupport = (text) => {
+            window.open(`https://wa.me/${CONTACT_PHONE}?text=${encodeURIComponent(text)}`, '_blank');
         };
 
-        window.handleDeleteListing = async (id) => {
-            if (!confirm("Delete this listing?")) return;
-            try {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'listings', id));
-            } catch (err) { alert(err.message); }
-        };
+        window.closeModals = () => document.querySelectorAll('#detail-modal, #auth-modal').forEach(m => m.classList.replace('flex', 'hidden'));
+        window.openAuthModal = () => document.getElementById('auth-modal').classList.replace('hidden', 'flex');
 
-        document.getElementById('btn-gen-image').onclick = async () => {
-            const title = document.getElementById('form-title').value;
-            const rank = document.getElementById('form-rank').value;
-            if (!title) return alert("Enter account title first!");
-
-            const loader = document.getElementById('gen-loader');
-            loader.classList.remove('hidden');
-
-            try {
-                const prompt = `Garena Free Fire professional character skin with ${rank} rank badge, mobile game screenshot style, high quality render, showcasing ${title}`;
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ instances: { prompt }, parameters: { sampleCount: 1 } })
-                });
-                
-                const result = await response.json();
-                if (result.predictions?.[0]?.bytesBase64Encoded) {
-                    currentImageBase64 = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
-                    const preview = document.getElementById('img-preview');
-                    preview.src = currentImageBase64;
-                    preview.classList.remove('hidden');
-                    document.getElementById('img-placeholder').classList.add('hidden');
-                }
-            } catch (err) {
-                console.error("AI Generation Error:", err);
-            } finally {
-                loader.classList.add('hidden');
-            }
-        };
-
-        const initializeFirebase = async () => {
+        async function init() {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
                     await signInAnonymously(auth);
                 }
-            } catch (e) {
-                await signInAnonymously(auth);
-            }
-        };
+            } catch (e) {}
 
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            const adminControls = document.getElementById('admin-controls');
-            const loginBtn = document.getElementById('nav-login');
-            
-            if (user) {
-                initDataSync(user);
-                if (!user.isAnonymous) {
-                    adminControls.classList.remove('hidden');
-                    loginBtn.classList.add('hidden');
-                } else {
-                    adminControls.classList.add('hidden');
-                    loginBtn.classList.remove('hidden');
-                    if (!document.getElementById('view-admin').classList.contains('hidden')) {
-                        showView('marketplace');
-                    }
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    fetchData('accounts');
                 }
-            }
-        });
+            });
+        }
+
+        function fetchData(type) {
+            const colRef = collection(db, 'artifacts', appId, 'public', 'data', type);
+            onSnapshot(colRef, (snap) => {
+                const data = [];
+                snap.forEach(doc => data.push({ id: doc.id, ...doc.data() }));
+                if (type === 'accounts') {
+                    accounts = data.length > 0 ? data : getDemoAccounts();
+                    if(currentView === 'accounts') applyFilters();
+                }
+            }, (err) => {
+                accounts = getDemoAccounts();
+                if(currentView === 'accounts') applyFilters();
+            });
+        }
+
+        function getDemoAccounts() {
+            return [
+                { id: 'a1', title: 'Grandmaster OG ID', price: 250, level: 85, rank: 'Grandmaster', img: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=600', seller: 'KingSL' },
+                { id: 'a2', title: 'Elite Master Bundle', price: 120, level: 72, rank: 'Master', img: 'https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?auto=format&fit=crop&q=80&w=600', seller: 'EliteGamer' },
+                { id: 'a3', title: 'Viper Specialist ID', price: 180, level: 65, rank: 'Heroic', img: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&q=80&w=600', seller: 'ViperModz' },
+                { id: 'a4', title: 'King Second ID', price: 90, level: 55, rank: 'Heroic', img: 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?auto=format&fit=crop&q=80&w=600', seller: 'KingSL' }
+            ];
+        }
 
         window.onload = () => {
-            initializeFirebase();
+            init();
+            renderView();
         };
 
     </script>
